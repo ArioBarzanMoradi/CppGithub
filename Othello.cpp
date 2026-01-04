@@ -4,16 +4,12 @@
 
 using namespace std;
 
-// اندازه صفحه بازی
 const int SIZE = 8;
 
 class OthelloGame {
 private:
     char board[SIZE][SIZE];
     char currentPlayer;
-
-    // جهت‌های ۸ گانه (بالا، پایین، چپ، راست و قطرها)
-    // Directions: {row_change, col_change}
     int directions[8][2] = {
         {-1, -1}, {-1, 0}, {-1, 1},
         {0, -1},           {0, 1},
@@ -22,23 +18,17 @@ private:
 
 public:
     OthelloGame() {
-        // ۱. مقداردهی اولیه: همه خانه‌ها خالی (.)
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 board[i][j] = '.';
             }
         }
-        // ۲. چیدن ۴ مهره اولیه در وسط
         board[3][3] = 'W';
         board[3][4] = 'B';
         board[4][3] = 'B';
         board[4][4] = 'W';
-
-        // سیاه همیشه شروع‌کننده است
         currentPlayer = 'B';
     }
-
-    // نمایش صفحه بازی
     void printBoard() {
         cout << "  0 1 2 3 4 5 6 7" << endl;
         for (int i = 0; i < SIZE; i++) {
@@ -51,7 +41,6 @@ public:
         cout << endl;
     }
 
-    // بررسی اینکه آیا حرکت در یک جهت خاص باعث تغییر رنگ می‌شود یا خیر
     bool checkDirection(int r, int c, int dr, int dc, bool flip) {
         char opponent = (currentPlayer == 'B') ? 'W' : 'B';
         int rOriginal = r, cOriginal = c;
@@ -64,10 +53,8 @@ public:
             if (board[r][c] == opponent) {
                 sawOpponent = true;
             } else if (board[r][c] == currentPlayer) {
-                // اگر مهره حریف را دیده باشیم و به مهره خودمان برسیم
                 if (sawOpponent) {
                     if (flip) {
-                        // برگشتن مسیر و تغییر رنگ مهره‌ها
                         int rr = rOriginal + dr;
                         int cc = cOriginal + dc;
                         while (rr != r || cc != c) {
@@ -78,18 +65,17 @@ public:
                     }
                     return true;
                 } else {
-                    return false; // بلافاصله به مهره خودمان رسیدیم (بدون حریف وسط)
+                    return false;
                 }
             } else {
-                return false; // به خانه خالی رسیدیم
+                return false;
             }
             r += dr;
             c += dc;
         }
-        return false; // به لبه زمین رسیدیم
+        return false;
     }
 
-    // بررسی اینکه آیا حرکت در خانه مورد نظر معتبر است؟
     bool isValidMove(int r, int c) {
         if (r < 0 || r >= SIZE || c < 0 || c >= SIZE || board[r][c] != '.')
             return false;
@@ -102,17 +88,12 @@ public:
         return false;
     }
 
-    // انجام حرکت و برگرداندن مهره‌ها
     bool makeMove(int r, int c) {
         if (!isValidMove(r, c)) return false;
-
-        board[r][c] = currentPlayer; // قرار دادن مهره جدید
-
-        // بررسی تمام جهات برای تغییر رنگ مهره‌های حریف
+        board[r][c] = currentPlayer;
         for (int i = 0; i < 8; i++) {
             checkDirection(r, c, directions[i][0], directions[i][1], true);
         }
-
         switchTurn();
         return true;
     }
@@ -170,9 +151,6 @@ int main() {
         if (!game.makeMove(row, col)) {
             cout << "Invalid move! Try again." << endl;
         }
-
-        // شرط پایان بازی: پر شدن صفحه (ساده‌ترین حالت)
-        // در نسخه کامل‌تر باید بررسی شود که هر دو بازیکن حرکت نداشته باشند (که در بالا چک شد)
     }
 
     game.getScore();
